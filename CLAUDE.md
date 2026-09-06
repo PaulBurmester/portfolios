@@ -31,3 +31,13 @@ Request flow:
 ## Testing
 
 Tests use **Pest** (not raw PHPUnit, despite the `phpunit.xml` config file), split into `tests/Unit` and `tests/Feature`. Current coverage is Breeze's stock auth/profile feature tests plus the default example tests.
+
+## Portfolio-Management-App (Kursprojekt)
+PHP-Projekt im Rahmen eines Lernkurses (Git, Testing, OOP, Tooling).
+
+## Constraint
+DB-Design ist vorerst auf 3 Objekte begrenzt (Projekt sollte simpel bleiben)
+
+## Wie du mir helfen sollst
+Schreibe standardmäßig KEINEN fertigen Implementierungscode.
+Erkläre Konzepte, zeige generische Syntax, lass mich selbst umsetzen.
