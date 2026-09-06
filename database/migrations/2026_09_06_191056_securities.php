@@ -16,7 +16,7 @@ return new class extends Migration
 
             $table->string('name');
             $table->string('ticker');
-            $table->string('ISIN')->unique();
+            $table->string('ISIN', 12)->unique();
             $table->decimal('price', 10, 2)->nullable();
             $table->string('type')->nullable();
 
