@@ -13,6 +13,13 @@ return new class extends Migration
     {
         Schema::create('securities', function (Blueprint $table) {
             $table->id();
+
+            $table->string('name');
+            $table->string('ticker');
+            $table->string('ISIN')->unique();
+            $table->decimal('price', 10, 2)->nullable();
+            $table->string('type')->nullable();
+
             $table->timestamps();
         });
     }
