@@ -2,7 +2,7 @@
 
 This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
 
-This is a Laravel 13 (PHP 8.4) educational starter application (composer package `ndeblauw/starterpack`), currently just past initial Laravel Breeze scaffolding — no portfolio-domain models/controllers exist yet despite the repo name.
+This is a Laravel 13 (PHP 8.4) educational starter application (composer package `ndeblauw/starterpack`), just past initial Laravel Breeze scaffolding. Portfolio-domain work is in progress — see "Projektzwischenstand" below for current status.
 
 **AGENTS.md** in the repo root is the authoritative, Laravel Boost-generated rules file (conventions, Pint/Pest/Herd rules, project structure guidance). Read and follow it — this file only adds a practical command/architecture map on top, without repeating its content.
 
@@ -25,7 +25,7 @@ Request flow:
 - Form validation: `app/Http/Requests/` (`ProfileUpdateRequest`, `Auth/LoginRequest`)
 - Model: `app/Models/User.php` is currently the only Eloquent model
 - Views: `resources/views/` — `layouts/{app,guest,app_navigation}.blade.php`, `userzone/` (dashboard, profile edit), `auth/*`, and `components/breeze/*` (Breeze's default Blade components were deliberately relocated into this subfolder, a deviation from stock Breeze layout)
-- Database: SQLite (`database/database.sqlite`); only stock migrations exist (users, cache, jobs) — no portfolio-domain schema yet
+- Database: SQLite (`database/database.sqlite`); stock migrations (users, cache, jobs) plus a first portfolio-domain migration (`securities`) — see "Projektzwischenstand" below
 - Frontend build: Vite + Tailwind CSS + Alpine.js
 
 ## Testing
@@ -37,6 +37,24 @@ PHP-Projekt im Rahmen eines Lernkurses (Git, Testing, OOP, Tooling).
 
 ## Constraint
 DB-Design ist vorerst auf 3 Objekte begrenzt (Projekt sollte simpel bleiben)
+
+## Projektzwischenstand (Stand: 2026-09-07)
+
+### Domain-Design (final für die 3-Objekte-Grenze)
+- **Security** (Stammdaten, unabhängig): `name`, `ticker`, `ISIN` (unique, 12 Zeichen), `type` (optional), `current_price`. hasMany Holdings.
+- **Portfolio** (gehört einem User): `user_id` (FK), `name`. belongsTo User, hasMany Holdings.
+- **Holding** (eigenständiges Model, keine reine Pivot-Tabelle — trägt eigene fachliche Daten): `portfolio_id` (FK), `security_id` (FK), `quantity`, `purchase_price`, `purchase_date`. belongsTo Portfolio, belongsTo Security.
+
+Many-to-many zwischen Portfolio und Security läuft indirekt über Holding. Migrationsreihenfolge wegen FK-Abhängigkeiten: **Security → Portfolio → Holding** (Holding hängt von beiden ab, muss zuletzt kommen; Security/Portfolio sind untereinander unabhängig).
+
+### Fortschritt
+- ✅ `database/migrations/2026_09_06_191056_securities.php` fertig: `name`/`ticker`/`ISIN` Pflichtfelder, `ISIN` unique + 12 Zeichen Länge, `price`/`type` nullable
+- ⬜ `Security`-Eloquent-Model (`app/Models/Security.php`) — noch nicht erstellt
+- ⬜ Portfolio-Migration — **nächster Schritt**; offene Frage im Gespräch war die Foreign-Key-Syntax für `user_id` (`foreignId()->constrained()`), noch nicht final besprochen
+- ⬜ `Portfolio`-Model
+- ⬜ Holding-Migration + Model (zuletzt, wegen doppelter FK-Abhängigkeit auf `portfolios` und `securities`)
+- ⬜ Beziehungen (`hasMany`/`belongsTo`) in den Models
+- ⬜ Controller/Routes für die drei Objekte
 
 ## Wie du mir helfen sollst
 Schreibe standardmäßig KEINEN fertigen Implementierungscode.
