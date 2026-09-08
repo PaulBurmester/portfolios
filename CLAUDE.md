@@ -38,7 +38,7 @@ PHP-Projekt im Rahmen eines Lernkurses (Git, Testing, OOP, Tooling).
 ## Constraint
 DB-Design ist vorerst auf 3 Objekte begrenzt (Projekt sollte simpel bleiben)
 
-## Projektzwischenstand (Stand: 2026-09-07)
+## Projektzwischenstand (Stand: 2026-09-07, aktualisiert)
 
 ### Domain-Design (final für die 3-Objekte-Grenze)
 - **Security** (Stammdaten, unabhängig): `name`, `ticker`, `ISIN` (unique, 12 Zeichen), `type` (optional), `current_price`. hasMany Holdings.
@@ -49,7 +49,7 @@ Many-to-many zwischen Portfolio und Security läuft indirekt über Holding. Migr
 
 ### Fortschritt
 - ✅ `database/migrations/2026_09_06_191056_securities.php` fertig: `name`/`ticker`/`ISIN` Pflichtfelder, `ISIN` unique + 12 Zeichen Länge, `price`/`type` nullable
-- ⬜ `Security`-Eloquent-Model (`app/Models/Security.php`) — noch nicht erstellt
+- ✅ `Security`-Eloquent-Model (`app/Models/Security.php`) fertig: `$fillable` mit `name`/`ticker`/`ISIN`/`price`/`type`. `$casts` für `price` (Decimal/Float) noch nicht besprochen — optional offen
 - ⬜ Portfolio-Migration — **nächster Schritt**; offene Frage im Gespräch war die Foreign-Key-Syntax für `user_id` (`foreignId()->constrained()`), noch nicht final besprochen
 - ⬜ `Portfolio`-Model
 - ⬜ Holding-Migration + Model (zuletzt, wegen doppelter FK-Abhängigkeit auf `portfolios` und `securities`)
