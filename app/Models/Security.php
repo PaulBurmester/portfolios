@@ -13,4 +13,8 @@ class Security extends Model
         'price',
         'type',
     ];
+    
+    protected $casts = [
+        'price' => 'decimal:2',
+    ];
 }
