@@ -38,7 +38,7 @@ PHP-Projekt im Rahmen eines Lernkurses (Git, Testing, OOP, Tooling).
 ## Constraint
 DB-Design ist vorerst auf 3 Objekte begrenzt (Projekt sollte simpel bleiben)
 
-## Projektzwischenstand (Stand: 2026-09-10, aktualisiert)
+## Projektzwischenstand (Stand: 2026-09-14, aktualisiert)
 
 ### Domain-Design (final für die 3-Objekte-Grenze)
 - **Security** (Stammdaten, unabhängig): `name`, `ticker`, `ISIN` (unique, 12 Zeichen), `type` (optional), `current_price`. hasMany Holdings.
@@ -49,12 +49,15 @@ Many-to-many zwischen Portfolio und Security läuft indirekt über Holding. Migr
 
 ### Fortschritt
 - ✅ `database/migrations/2026_09_06_191056_securities.php` fertig: `name`/`ticker`/`ISIN` Pflichtfelder, `ISIN` unique + 12 Zeichen Länge, `price`/`type` nullable
-- ✅ `Security`-Eloquent-Model (`app/Models/Security.php`) fertig: `$fillable` mit `name`/`ticker`/`ISIN`/`price`/`type`, `$casts` für `price` (`decimal:2`)
+- ✅ `Security`-Eloquent-Model (`app/Models/Security.php`) fertig: `$fillable` mit `name`/`ticker`/`ISIN`/`price`/`type`, `$casts` für `price` (`decimal:2`), `hasMany(Holding::class)`
 - ✅ `database/migrations/2026_09_09_100739_create_portfolios_table.php` fertig: `user_id` als FK via `foreignId()->constrained()->onDelete('cascade')`, `name`
-- ✅ `Portfolio`-Eloquent-Model (`app/Models/Portfolio.php`) fertig: `$fillable` mit `user_id`/`name`, `belongsTo(User::class)`, `hasMany(Holding::class)` (Holding-Klasse folgt als nächstes)
-- ⬜ Holding-Migration — **nächster Schritt**: FK-Spalten `security_id`/`portfolio_id` (Namenskonvention → `constrained()` ohne Parameter reicht), `quantity`/`purchase_price`/`purchase_date` noch zu typisieren (Datentypen zuletzt besprochen, Entscheidung offen), Cascade-Verhalten analog zu `portfolios` (Kette User → Portfolio → Holding cascadiert vollständig, sofern `portfolio_id` in `holdings` ebenfalls `cascadeOnDelete()` bekommt)
-- ⬜ Holding-Model (`belongsTo Portfolio`, `belongsTo Security`)
+- ✅ `Portfolio`-Eloquent-Model (`app/Models/Portfolio.php`) fertig: `$fillable` mit `user_id`/`name`, `belongsTo(User::class)`, `hasMany(Holding::class)`
+- ✅ `database/migrations/2026_09_11_065424_create_holdings_table.php` fertig: `portfolio_id` mit `constrained()->onDelete('cascade')` (Portfolio gelöscht → Holdings mitgelöscht), `security_id` mit `constrained()` ohne explizites `onDelete` (DB-Default verhindert Löschen einer referenzierten Security), `quantity` als `unsignedInteger` (bewusst: keine Bruchstücke im Scope), `purchase_price` als `decimal(15, 2)`, `purchase_date` als `date`
+- ✅ `Holding`-Eloquent-Model (`app/Models/Holding.php`) fertig: `$fillable` mit `portfolio_id`/`security_id`/`quantity`/`purchase_price`/`purchase_date`, `belongsTo(Portfolio::class)`, `belongsTo(Security::class)`, `$casts` für `quantity` (`integer`), `purchase_price` (`decimal:2`), `purchase_date` (`date`)
+- ✅ Migrationen ausgeführt (`migrate` + `db:seed`), Test-User vorhanden
+- 🔄 Beziehungen werden gerade manuell in Tinkerwell verifiziert: `Security::create()` (#1, Apple/AAPL) und `Portfolio::create()` (#1, MyFirstPortfolio, user_id 1) sind angelegt — **nächster Schritt**: `Holding::create()` mit `portfolio_id`/`security_id`/`quantity`/`purchase_price`/`purchase_date`, danach die Beziehungskette `$portfolio->holdings->first()->security->name` testen
 - ⬜ Controller/Routes für die drei Objekte
+- ⬜ Offene Design-Idee (noch nicht umgesetzt): Gewinn einer Position als berechnetes Attribut (Eloquent Accessor auf `Holding`, aus `security.price`, `purchase_price`, `quantity`), nicht als eigene DB-Spalte, wegen Veraltungsgefahr bei Kursänderungen
 
 ## Entwicklungsablauf (Workflow-Konvention)
 Pro Feature in dieser Reihenfolge vorgehen: Migration → Model (+ Factory/Seeder) → Controller → View → Route.
