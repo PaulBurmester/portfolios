@@ -38,7 +38,7 @@ PHP-Projekt im Rahmen eines Lernkurses (Git, Testing, OOP, Tooling).
 ## Constraint
 DB-Design ist vorerst auf 3 Objekte begrenzt (Projekt sollte simpel bleiben)
 
-## Projektzwischenstand (Stand: 2026-09-09, aktualisiert)
+## Projektzwischenstand (Stand: 2026-09-10, aktualisiert)
 
 ### Domain-Design (final für die 3-Objekte-Grenze)
 - **Security** (Stammdaten, unabhängig): `name`, `ticker`, `ISIN` (unique, 12 Zeichen), `type` (optional), `current_price`. hasMany Holdings.
@@ -49,12 +49,20 @@ Many-to-many zwischen Portfolio und Security läuft indirekt über Holding. Migr
 
 ### Fortschritt
 - ✅ `database/migrations/2026_09_06_191056_securities.php` fertig: `name`/`ticker`/`ISIN` Pflichtfelder, `ISIN` unique + 12 Zeichen Länge, `price`/`type` nullable
-- ✅ `Security`-Eloquent-Model (`app/Models/Security.php`) fertig: `$fillable` mit `name`/`ticker`/`ISIN`/`price`/`type`. `$casts` für `price` (Decimal/Float) noch nicht besprochen — optional offen
+- ✅ `Security`-Eloquent-Model (`app/Models/Security.php`) fertig: `$fillable` mit `name`/`ticker`/`ISIN`/`price`/`type`, `$casts` für `price` (`decimal:2`)
 - ✅ `database/migrations/2026_09_09_100739_create_portfolios_table.php` fertig: `user_id` als FK via `foreignId()->constrained()->onDelete('cascade')`, `name`
-- ⬜ `Portfolio`-Model — **nächster Schritt**
-- ⬜ Holding-Migration + Model (zuletzt, wegen doppelter FK-Abhängigkeit auf `portfolios` und `securities`)
-- ⬜ Beziehungen (`hasMany`/`belongsTo`) in den Models
+- ✅ `Portfolio`-Eloquent-Model (`app/Models/Portfolio.php`) fertig: `$fillable` mit `user_id`/`name`, `belongsTo(User::class)`, `hasMany(Holding::class)` (Holding-Klasse folgt als nächstes)
+- ⬜ Holding-Migration — **nächster Schritt**: FK-Spalten `security_id`/`portfolio_id` (Namenskonvention → `constrained()` ohne Parameter reicht), `quantity`/`purchase_price`/`purchase_date` noch zu typisieren (Datentypen zuletzt besprochen, Entscheidung offen), Cascade-Verhalten analog zu `portfolios` (Kette User → Portfolio → Holding cascadiert vollständig, sofern `portfolio_id` in `holdings` ebenfalls `cascadeOnDelete()` bekommt)
+- ⬜ Holding-Model (`belongsTo Portfolio`, `belongsTo Security`)
 - ⬜ Controller/Routes für die drei Objekte
+
+## Entwicklungsablauf (Workflow-Konvention)
+Pro Feature in dieser Reihenfolge vorgehen: Migration → Model (+ Factory/Seeder) → Controller → View → Route.
+- Refactors und reines Styling in eigene Commits trennen, nicht mit Feature-Commits mischen.
+- CRUD nicht auf einmal bauen: index, dann create+store, dann edit+update, dann destroy — jeweils eigener Schritt/Commit.
+- Styling erst einbauen, wenn die Funktionalität steht, nicht vorher.
+- Routen-Datei regelmäßig aufräumen/strukturieren, bevor neue Routen dazukommen.
+- Kleine, in sich abgeschlossene Commits mit klarer Beschreibung, was sich fachlich geändert hat.
 
 ## Wie du mir helfen sollst
 Schreibe standardmäßig KEINEN fertigen Implementierungscode.

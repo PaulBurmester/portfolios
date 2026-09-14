@@ -13,8 +13,13 @@ class Security extends Model
         'price',
         'type',
     ];
-    
+
     protected $casts = [
         'price' => 'decimal:2',
     ];
+    
+    public function holdings()
+    {
+        return $this->hasMany(Holding::class);
+    }
 }
