@@ -1,7 +1,9 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace App\Http\Controllers\Financezone;
 
+use App\Http\Controllers\Controller;
+use App\Models\Security;
 use Illuminate\Http\Request;
 
 class SecurityController extends Controller
@@ -11,7 +13,8 @@ class SecurityController extends Controller
      */
     public function index()
     {
-        //
+        $securities = Security::all();
+        return view('financezone.security.index', ['securities' => $securities]);
     }
 
     /**
