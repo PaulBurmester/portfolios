@@ -20,12 +20,12 @@ This is a Laravel 13 (PHP 8.4) educational starter application (composer package
 
 Request flow:
 - Entry point: `public/index.php` → `bootstrap/app.php` (registers routing/middleware/exception handling; no custom middleware registered yet)
-- Routes: `routes/web.php` defines app routes (`/`, `/dashboard`, and `/profile` CRUD under the `auth` middleware group) and pulls in `routes/auth.php` (Breeze-generated auth routes)
-- Controllers: `app/Http/Controllers/Controller.php` is the abstract base class all controllers extend. `Auth/*Controller.php` are Breeze-generated; `Userzone/ProfileController.php` is the one app-specific controller
+- Routes: `routes/web.php` defines app routes (`/`, `/dashboard`, `/profile` CRUD, and `/securities` — all resource groups under the `auth` middleware) and pulls in `routes/auth.php` (Breeze-generated auth routes)
+- Controllers: `app/Http/Controllers/Controller.php` is the abstract base class all controllers extend. `Auth/*Controller.php` are Breeze-generated; `Userzone/ProfileController.php` and `Financezone/SecurityController.php` are the app-specific controllers (`SecurityController` currently only has `index()` implemented, the rest are empty resource-controller stubs)
 - Form validation: `app/Http/Requests/` (`ProfileUpdateRequest`, `Auth/LoginRequest`)
-- Model: `app/Models/User.php` is currently the only Eloquent model
-- Views: `resources/views/` — `layouts/{app,guest,app_navigation}.blade.php`, `userzone/` (dashboard, profile edit), `auth/*`, and `components/breeze/*` (Breeze's default Blade components were deliberately relocated into this subfolder, a deviation from stock Breeze layout)
-- Database: SQLite (`database/database.sqlite`); stock migrations (users, cache, jobs) plus a first portfolio-domain migration (`securities`) — see "Projektzwischenstand" below
+- Models: `app/Models/User.php`, `Security.php`, `Portfolio.php`, `Holding.php` — see "Projektzwischenstand" below for the portfolio-domain models and their relationships
+- Views: `resources/views/` — `layouts/{app,guest,app_navigation}.blade.php`, `userzone/` (dashboard, profile edit), `financezone/security/` (index), `auth/*`, and `components/breeze/*` (Breeze's default Blade components were deliberately relocated into this subfolder, a deviation from stock Breeze layout)
+- Database: SQLite (`database/database.sqlite`); stock migrations (users, cache, jobs) plus the portfolio-domain migrations (`securities`, `portfolios`, `holdings`) — see "Projektzwischenstand" below
 - Frontend build: Vite + Tailwind CSS + Alpine.js
 
 ## Testing
@@ -38,7 +38,7 @@ PHP-Projekt im Rahmen eines Lernkurses (Git, Testing, OOP, Tooling).
 ## Constraint
 DB-Design ist vorerst auf 3 Objekte begrenzt (Projekt sollte simpel bleiben)
 
-## Projektzwischenstand (Stand: 2026-09-14, aktualisiert)
+## Projektzwischenstand (Stand: 2026-09-20, aktualisiert)
 
 ### Domain-Design (final für die 3-Objekte-Grenze)
 - **Security** (Stammdaten, unabhängig): `name`, `ticker`, `ISIN` (unique, 12 Zeichen), `type` (optional), `current_price`. hasMany Holdings.
@@ -55,8 +55,13 @@ Many-to-many zwischen Portfolio und Security läuft indirekt über Holding. Migr
 - ✅ `database/migrations/2026_09_11_065424_create_holdings_table.php` fertig: `portfolio_id` mit `constrained()->onDelete('cascade')` (Portfolio gelöscht → Holdings mitgelöscht), `security_id` mit `constrained()` ohne explizites `onDelete` (DB-Default verhindert Löschen einer referenzierten Security), `quantity` als `unsignedInteger` (bewusst: keine Bruchstücke im Scope), `purchase_price` als `decimal(15, 2)`, `purchase_date` als `date`
 - ✅ `Holding`-Eloquent-Model (`app/Models/Holding.php`) fertig: `$fillable` mit `portfolio_id`/`security_id`/`quantity`/`purchase_price`/`purchase_date`, `belongsTo(Portfolio::class)`, `belongsTo(Security::class)`, `$casts` für `quantity` (`integer`), `purchase_price` (`decimal:2`), `purchase_date` (`date`)
 - ✅ Migrationen ausgeführt (`migrate` + `db:seed`), Test-User vorhanden
-- 🔄 Beziehungen werden gerade manuell in Tinkerwell verifiziert: `Security::create()` (#1, Apple/AAPL) und `Portfolio::create()` (#1, MyFirstPortfolio, user_id 1) sind angelegt — **nächster Schritt**: `Holding::create()` mit `portfolio_id`/`security_id`/`quantity`/`purchase_price`/`purchase_date`, danach die Beziehungskette `$portfolio->holdings->first()->security->name` testen
-- ⬜ Controller/Routes für die drei Objekte
+- ✅ Beziehungen manuell verifiziert (Security/Portfolio/Holding-Kette funktioniert)
+- ✅ `SecurityFactory` (`database/factories/SecurityFactory.php`) angelegt
+- ✅ **Security-CRUD, Schritt `index`**: `SecurityController::index()` (`app/Http/Controllers/Financezone/SecurityController.php`), View `resources/views/financezone/security/index.blade.php`, Route `GET /securities` → `security.index` (in eigener `auth`-Middleware-Gruppe in `routes/web.php`) — End-to-End getestet, funktioniert
+- 🔄 **Nächster Schritt**: Security-CRUD `create`+`store` (Controller-Methoden sind als leere Stubs angelegt, noch zu befüllen)
+- ⬜ Portfolio: Controller/View/Route noch offen (nur Migration + Model fertig)
+- ⬜ Holding: Controller/View/Route noch offen (nur Migration + Model fertig); auch noch keine Factory
+- ⬜ `DatabaseSeeder` seedet bisher nur den Test-User, keine Securities/Portfolios/Holdings
 - ⬜ Offene Design-Idee (noch nicht umgesetzt): Gewinn einer Position als berechnetes Attribut (Eloquent Accessor auf `Holding`, aus `security.price`, `purchase_price`, `quantity`), nicht als eigene DB-Spalte, wegen Veraltungsgefahr bei Kursänderungen
 
 ## Entwicklungsablauf (Workflow-Konvention)
