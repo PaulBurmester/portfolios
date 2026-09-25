@@ -21,7 +21,7 @@ This is a Laravel 13 (PHP 8.4) educational starter application (composer package
 Request flow:
 - Entry point: `public/index.php` → `bootstrap/app.php` (registers routing/middleware/exception handling; no custom middleware registered yet)
 - Routes: `routes/web.php` defines app routes (`/`, `/dashboard`, `/profile` CRUD, and `/securities` — all resource groups under the `auth` middleware) and pulls in `routes/auth.php` (Breeze-generated auth routes)
-- Controllers: `app/Http/Controllers/Controller.php` is the abstract base class all controllers extend. `Auth/*Controller.php` are Breeze-generated; `Userzone/ProfileController.php` and `Financezone/SecurityController.php` are the app-specific controllers (`SecurityController` currently only has `index()` implemented, the rest are empty resource-controller stubs)
+- Controllers: `app/Http/Controllers/Controller.php` is the abstract base class all controllers extend. `Auth/*Controller.php` are Breeze-generated; `Userzone/ProfileController.php` and `Financezone/SecurityController.php` are the app-specific controllers (`SecurityController` currently has `index()`, `create()`, and `store()` implemented; `show`/`edit`/`update`/`destroy` are still empty resource-controller stubs)
 - Form validation: `app/Http/Requests/` (`ProfileUpdateRequest`, `Auth/LoginRequest`)
 - Models: `app/Models/User.php`, `Security.php`, `Portfolio.php`, `Holding.php` — see "Projektzwischenstand" below for the portfolio-domain models and their relationships
 - Views: `resources/views/` — `layouts/{app,guest,app_navigation}.blade.php`, `userzone/` (dashboard, profile edit), `financezone/security/` (index), `auth/*`, and `components/breeze/*` (Breeze's default Blade components were deliberately relocated into this subfolder, a deviation from stock Breeze layout)
@@ -38,10 +38,10 @@ PHP-Projekt im Rahmen eines Lernkurses (Git, Testing, OOP, Tooling).
 ## Constraint
 DB-Design ist vorerst auf 3 Objekte begrenzt (Projekt sollte simpel bleiben)
 
-## Projektzwischenstand (Stand: 2026-09-20, aktualisiert)
+## Projektzwischenstand (Stand: 2026-09-25, aktualisiert)
 
 ### Domain-Design (final für die 3-Objekte-Grenze)
-- **Security** (Stammdaten, unabhängig): `name`, `ticker`, `ISIN` (unique, 12 Zeichen), `type` (optional), `current_price`. hasMany Holdings.
+- **Security** (Stammdaten, unabhängig): `name`, `ticker`, `ISIN` (unique, 12 Zeichen), `type` (optional), `current_price` (nullable — bewusst so belassen, weil der Preis später automatisiert per Yahoo-API nachgezogen werden soll und beim Anlegen einer Security noch unbekannt sein kann; Spalte heißt in Migration/Model tatsächlich `price`, nicht `current_price`). hasMany Holdings.
 - **Portfolio** (gehört einem User): `user_id` (FK), `name`. belongsTo User, hasMany Holdings.
 - **Holding** (eigenständiges Model, keine reine Pivot-Tabelle — trägt eigene fachliche Daten): `portfolio_id` (FK), `security_id` (FK), `quantity`, `purchase_price`, `purchase_date`. belongsTo Portfolio, belongsTo Security.
 
@@ -58,7 +58,10 @@ Many-to-many zwischen Portfolio und Security läuft indirekt über Holding. Migr
 - ✅ Beziehungen manuell verifiziert (Security/Portfolio/Holding-Kette funktioniert)
 - ✅ `SecurityFactory` (`database/factories/SecurityFactory.php`) angelegt
 - ✅ **Security-CRUD, Schritt `index`**: `SecurityController::index()` (`app/Http/Controllers/Financezone/SecurityController.php`), View `resources/views/financezone/security/index.blade.php`, Route `GET /securities` → `security.index` (in eigener `auth`-Middleware-Gruppe in `routes/web.php`) — End-to-End getestet, funktioniert
-- 🔄 **Nächster Schritt**: Security-CRUD `create`+`store` (Controller-Methoden sind als leere Stubs angelegt, noch zu befüllen)
+- ✅ **Security-CRUD, Schritt `store`**: `SecurityController::store()` fertig — `$request->validate([...])` (u. a. `unique:securities,ISIN`, `size:12` für ISIN, `decimal:2` + `nullable` für `price`), `Security::create($validated)`, `redirect()->route('security.index')`. Route `POST /securities` → `security.store`. Manuell getestet (kein Pest-Feature-Test bisher — bewusst zurückgestellt, siehe unten)
+- ✅ **Security-CRUD, Schritt `create` (Controller + Route)**: `SecurityController::create()` gibt `view('financezone.security.create')` zurück (noch ohne Daten). Route `GET /securities/create` → `security.create`, steht in der `web.php` bewusst vor der `store`-Route (Konvention: feste URLs vor Platzhalter-Routen, hier noch nicht akut, aber für spätere `{security}`-Routen relevant)
+- 🔄 **Nächster Schritt**: View `resources/views/financezone/security/create.blade.php` mit dem Formular (`method="POST"`, `action="{{ route('security.store') }}"`, `@csrf`, Felder für `name`/`ticker`/`ISIN`/`price`/`type`) — existiert noch nicht als Datei. Danach End-to-End im Browser durchklicken
+- ⬜ Offene Position: Pest-Feature-Test für `store()` (gültige + ungültige Daten, `assertRedirect`/`assertDatabaseHas`/`assertInvalid`, mit `actingAs`) — bewusst nach hinten verschoben, sollte nachgeholt werden, sobald CRUD für Security steht
 - ⬜ Portfolio: Controller/View/Route noch offen (nur Migration + Model fertig)
 - ⬜ Holding: Controller/View/Route noch offen (nur Migration + Model fertig); auch noch keine Factory
 - ⬜ `DatabaseSeeder` seedet bisher nur den Test-User, keine Securities/Portfolios/Holdings

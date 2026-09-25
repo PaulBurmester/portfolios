@@ -18,6 +18,8 @@ Route::middleware('auth')->group(function () {
 
 Route::middleware('auth')->group(function () {
     Route::get('/securities', [App\Http\Controllers\Financezone\SecurityController::class, 'index'])->name('security.index');
+    Route::get('/securities/create', [App\Http\Controllers\Financezone\SecurityController::class, 'create'])->name('security.create');
+    Route::post('/securities', [App\Http\Controllers\Financezone\SecurityController::class, 'store'])->name('security.store');
 });
 
 require __DIR__.'/auth.php';

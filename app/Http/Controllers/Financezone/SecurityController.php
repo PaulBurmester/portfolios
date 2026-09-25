@@ -22,7 +22,7 @@ class SecurityController extends Controller
      */
     public function create()
     {
-        //
+        return view('financezone.security.create');
     }
 
     /**
@@ -30,7 +30,17 @@ class SecurityController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        $validated = $request->validate([
+            'name' => ['required', 'min:3'],
+            'ticker' => ['required', 'min:1', 'max:5'],
+            'ISIN' => ['unique:securities,ISIN', 'required', 'size:12'],
+            'price' => ['nullable', 'decimal:2'],
+            'type' => ['nullable'],
+        ]);
+
+        Security::create($validated);
+
+        return redirect()->route('security.index');
     }
 
     /**
