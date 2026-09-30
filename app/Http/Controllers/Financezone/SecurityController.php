@@ -14,6 +14,7 @@ class SecurityController extends Controller
     public function index()
     {
         $securities = Security::all();
+
         return view('financezone.security.index', ['securities' => $securities]);
     }
 
@@ -32,10 +33,19 @@ class SecurityController extends Controller
     {
         $validated = $request->validate([
             'name' => ['required', 'min:3'],
-            'ticker' => ['required', 'min:1', 'max:5'],
+            'ticker' => ['required', 'max:5'],
             'ISIN' => ['unique:securities,ISIN', 'required', 'size:12'],
             'price' => ['nullable', 'decimal:2'],
             'type' => ['nullable'],
+        ], [
+            'name.required' => 'You need to enter a Name',
+            'name.min' => 'The Name must have at least 3 letters',
+            'ticker.required' => 'You need to enter a Ticker',
+            'ticker.max' => 'Ticker can not be longer than 5 characters',
+            'ISIN.unique' => 'There is already a Security with this ISIN',
+            'ISIN.required' => 'You need to enter an ISIN',
+            'ISIN.size' => 'The ISIN needs to be 12 characters long',
+            'price' => 'The price needs to have two decimal places',
         ]);
 
         Security::create($validated);

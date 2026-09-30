@@ -24,7 +24,7 @@ Request flow:
 - Controllers: `app/Http/Controllers/Controller.php` is the abstract base class all controllers extend. `Auth/*Controller.php` are Breeze-generated; `Userzone/ProfileController.php` and `Financezone/SecurityController.php` are the app-specific controllers (`SecurityController` currently has `index()`, `create()`, and `store()` implemented; `show`/`edit`/`update`/`destroy` are still empty resource-controller stubs)
 - Form validation: `app/Http/Requests/` (`ProfileUpdateRequest`, `Auth/LoginRequest`)
 - Models: `app/Models/User.php`, `Security.php`, `Portfolio.php`, `Holding.php` — see "Projektzwischenstand" below for the portfolio-domain models and their relationships
-- Views: `resources/views/` — `layouts/{app,guest,app_navigation}.blade.php`, `userzone/` (dashboard, profile edit), `financezone/security/` (index), `auth/*`, and `components/breeze/*` (Breeze's default Blade components were deliberately relocated into this subfolder, a deviation from stock Breeze layout)
+- Views: `resources/views/` — `layouts/{app,guest,app_navigation}.blade.php`, `userzone/` (dashboard, profile edit), `financezone/security/` (index, create), `auth/*`, and `components/breeze/*` (Breeze's default Blade components were deliberately relocated into this subfolder, a deviation from stock Breeze layout)
 - Database: SQLite (`database/database.sqlite`); stock migrations (users, cache, jobs) plus the portfolio-domain migrations (`securities`, `portfolios`, `holdings`) — see "Projektzwischenstand" below
 - Frontend build: Vite + Tailwind CSS + Alpine.js
 
@@ -38,7 +38,7 @@ PHP-Projekt im Rahmen eines Lernkurses (Git, Testing, OOP, Tooling).
 ## Constraint
 DB-Design ist vorerst auf 3 Objekte begrenzt (Projekt sollte simpel bleiben)
 
-## Projektzwischenstand (Stand: 2026-09-25, aktualisiert)
+## Projektzwischenstand (Stand: 2026-09-30)
 
 ### Domain-Design (final für die 3-Objekte-Grenze)
 - **Security** (Stammdaten, unabhängig): `name`, `ticker`, `ISIN` (unique, 12 Zeichen), `type` (optional), `current_price` (nullable — bewusst so belassen, weil der Preis später automatisiert per Yahoo-API nachgezogen werden soll und beim Anlegen einer Security noch unbekannt sein kann; Spalte heißt in Migration/Model tatsächlich `price`, nicht `current_price`). hasMany Holdings.
@@ -60,7 +60,13 @@ Many-to-many zwischen Portfolio und Security läuft indirekt über Holding. Migr
 - ✅ **Security-CRUD, Schritt `index`**: `SecurityController::index()` (`app/Http/Controllers/Financezone/SecurityController.php`), View `resources/views/financezone/security/index.blade.php`, Route `GET /securities` → `security.index` (in eigener `auth`-Middleware-Gruppe in `routes/web.php`) — End-to-End getestet, funktioniert
 - ✅ **Security-CRUD, Schritt `store`**: `SecurityController::store()` fertig — `$request->validate([...])` (u. a. `unique:securities,ISIN`, `size:12` für ISIN, `decimal:2` + `nullable` für `price`), `Security::create($validated)`, `redirect()->route('security.index')`. Route `POST /securities` → `security.store`. Manuell getestet (kein Pest-Feature-Test bisher — bewusst zurückgestellt, siehe unten)
 - ✅ **Security-CRUD, Schritt `create` (Controller + Route)**: `SecurityController::create()` gibt `view('financezone.security.create')` zurück (noch ohne Daten). Route `GET /securities/create` → `security.create`, steht in der `web.php` bewusst vor der `store`-Route (Konvention: feste URLs vor Platzhalter-Routen, hier noch nicht akut, aber für spätere `{security}`-Routen relevant)
-- 🔄 **Nächster Schritt**: View `resources/views/financezone/security/create.blade.php` mit dem Formular (`method="POST"`, `action="{{ route('security.store') }}"`, `@csrf`, Felder für `name`/`ticker`/`ISIN`/`price`/`type`) — existiert noch nicht als Datei. Danach End-to-End im Browser durchklicken
+- ✅ **Security-CRUD, Schritt `create` (View)**: `resources/views/financezone/security/create.blade.php` fertig und committet (`ebf9ab1`) — Formular mit `method="post"`, `action="{{ route('security.store') }}"`, `@csrf`; pro Feld ein Block aus `label`/`input`/`old()`/`@error`. `required` nur bei den Pflichtfeldern `name`/`ticker`/`ISIN`; `price` als `type="number"` mit `step="0.01"` (passend zu `decimal:2`); `type` vorerst Freitext (Idee für später: `<select>` mit festen Optionen gegen Tippfehler). Noch ohne Styling (bewusst)
+- ✅ **End-to-End-Test create/store** im Browser erfolgreich (Login Test-User: `test@example.com` / `password`), 4 Fälle: gültige Daten → Redirect auf Index; doppelte ISIN → Fehlermeldung + `old()`-Werte bleiben; ISIN mit 11 Zeichen → `size:12` greift; leerer Preis → wird akzeptiert
+- ✅ **Eigene Validierungs-Fehlermeldungen** in `SecurityController::store()` über das zweite Array von `validate()`, Keys im Format `feld.regel` (Regelname ohne Parameter, z. B. `name.min` statt `name.min:3`). Abgedeckt: `name.required`/`name.min`, `ticker.required`/`ticker.max`, `ISIN.unique`/`ISIN.required`/`ISIN.size`, `price` (reiner Feld-Key — greift laut Laravel-Quellcode als Fallback für alle `price`-Regeln; Empfehlung: auf `price.decimal` umstellen, sobald weitere `price`-Regeln dazukommen). Bei `ticker` wurde `min:1` entfernt (redundant zu `required`). View unverändert, `{{ $message }}` übernimmt die Texte. Manuell getestet, **noch nicht committet**
+- 🔄 **Nächster Schritt**: Pint laufen lassen und Fehlermeldungen als eigenen Commit festhalten
+- ✅ Entscheidung: `decimal:2` bei `price` bleibt bewusst so (verlangt **genau** 2 Nachkommastellen — `10` oder `10.5` werden abgelehnt, Fehlermeldung weist darauf hin)
+- ⬜ Geplanter Refactor (eigener Commit): Formularfeld-Block (`label`/`input`/`old()`/`@error`) in wiederverwendbare Blade-Komponenten auslagern — Vorbild: Kursprojekt `hotspot` des Professors (`resources/views/components/form-text-input.blade.php`, `form-number-input`, `form-textarea`, Props `name`/`label`/`placeholder`/`value`). Sinnvoll vor dem `edit`-Formular, damit der Block nicht doppelt gepflegt wird
+- ⬜ Danach: Security-CRUD, Schritt `edit` + `update`
 - ⬜ Offene Position: Pest-Feature-Test für `store()` (gültige + ungültige Daten, `assertRedirect`/`assertDatabaseHas`/`assertInvalid`, mit `actingAs`) — bewusst nach hinten verschoben, sollte nachgeholt werden, sobald CRUD für Security steht
 - ⬜ Portfolio: Controller/View/Route noch offen (nur Migration + Model fertig)
 - ⬜ Holding: Controller/View/Route noch offen (nur Migration + Model fertig); auch noch keine Factory
