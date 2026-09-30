@@ -20,6 +20,8 @@ Route::middleware('auth')->group(function () {
     Route::get('/securities', [App\Http\Controllers\Financezone\SecurityController::class, 'index'])->name('security.index');
     Route::get('/securities/create', [App\Http\Controllers\Financezone\SecurityController::class, 'create'])->name('security.create');
     Route::post('/securities', [App\Http\Controllers\Financezone\SecurityController::class, 'store'])->name('security.store');
+    Route::get('/securities/{security}/edit', [App\Http\Controllers\Financezone\SecurityController::class, 'edit'])->name('security.edit');
+    Route::put('/securities/{security}', [App\Http\Controllers\Financezone\SecurityController::class, 'update'])->name('security.update');
 });
 
 require __DIR__.'/auth.php';
