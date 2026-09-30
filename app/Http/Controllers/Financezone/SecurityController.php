@@ -14,7 +14,6 @@ class SecurityController extends Controller
     public function index()
     {
         $securities = Security::all();
-
         return view('financezone.security.index', ['securities' => $securities]);
     }
 
@@ -39,7 +38,7 @@ class SecurityController extends Controller
             'type' => ['nullable'],
         ], [
             'name.required' => 'You need to enter a Name',
-            'name.min' => 'The Name must have at least 3 letters',
+            'name.min' => 'The Name must have at least 3 characters',
             'ticker.required' => 'You need to enter a Ticker',
             'ticker.max' => 'Ticker can not be longer than 5 characters',
             'ISIN.unique' => 'There is already a Security with this ISIN',
@@ -64,9 +63,9 @@ class SecurityController extends Controller
     /**
      * Show the form for editing the specified resource.
      */
-    public function edit(string $id)
+    public function edit(Security $security)
     {
-        //
+        return view('financezone.security.edit', ['security' => $security]);
     }
 
     /**
