@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Financezone;
 use App\Http\Controllers\Controller;
 use App\Models\Security;
 use Illuminate\Http\Request;
+use Illuminate\Validation\Rule;
 
 class SecurityController extends Controller
 {
@@ -71,9 +72,28 @@ class SecurityController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, string $id)
+    public function update(Request $request, Security $security)
     {
-        //
+        $validated = $request->validate([
+            'name' => ['required', 'min:3'],
+            'ticker' => ['required', 'max:5'],
+            'ISIN' => ['required', 'size:12', Rule::unique('securities', 'ISIN')->ignore($security)],
+            'price' => ['nullable', 'decimal:2'],
+            'type' => ['nullable'],
+        ], [
+            'name.required' => 'You need to enter a Name',
+            'name.min' => 'The Name must have at least 3 characters',
+            'ticker.required' => 'You need to enter a Ticker',
+            'ticker.max' => 'Ticker can not be longer than 5 characters',
+            'ISIN.unique' => 'There is already a Security with this ISIN',
+            'ISIN.required' => 'You need to enter an ISIN',
+            'ISIN.size' => 'The ISIN needs to be 12 characters long',
+            'price' => 'The price needs to have two decimal places',
+        ]);
+
+        $security->update($validated);
+
+        return redirect()->route('security.index');
     }
 
     /**

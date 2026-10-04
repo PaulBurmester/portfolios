@@ -1,6 +1,6 @@
 <x-app-layout>
     <x-slot name="header">
-        <h2>Edit the Security</h2>
+        <h2>Edit Security</h2>
     </x-slot>
 
     <div>
