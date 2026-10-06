@@ -7,11 +7,10 @@
         @forelse ($portfolios as $portfolio)
             <div>
                 {{ $portfolio->name }}
-                    @csrf
-                </form>
             </div>
         @empty
             <p>Keine Einträge.</p>
         @endforelse
+        <a href="{{ route('portfolio.create') }}">Add new portfolio</a>
     </div>
  </x-app-layout>

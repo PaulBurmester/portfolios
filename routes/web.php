@@ -1,7 +1,7 @@
 <?php
 
-use App\Http\Controllers\Financezone\SecurityController;
 use App\Http\Controllers\Financezone\PortfolioController;
+use App\Http\Controllers\Financezone\SecurityController;
 use App\Http\Controllers\Userzone\ProfileController;
 use Illuminate\Support\Facades\Route;
 
@@ -30,6 +30,8 @@ Route::middleware('auth')->group(function () {
 
 Route::middleware('auth')->group(function () {
     Route::get('/portfolios', [PortfolioController::class, 'index'])->name('portfolio.index');
+    Route::get('/portfolios/create', [PortfolioController::class, 'create'])->name('portfolio.create');
+    Route::post('/portfolios', [PortfolioController::class, 'store'])->name('portfolio.store');
 });
 
 require __DIR__.'/auth.php';

@@ -24,7 +24,7 @@ class PortfolioController extends Controller
      */
     public function create()
     {
-        //
+        return view('financezone.portfolio.create');
     }
 
     /**
@@ -32,7 +32,17 @@ class PortfolioController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        $validated = $request->validate([
+            'name' => ['required', 'min:3'],
+
+        ], [
+            'name.required' => 'You need to enter a Name',
+            'name.min' => 'The Name must have at least 3 characters',
+        ]);
+
+        $request->user()->portfolios()->create($validated);
+
+        return redirect()->route('portfolio.index');
     }
 
     /**
