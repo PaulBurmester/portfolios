@@ -14,7 +14,7 @@
             <x-form-text-input name="price" label="Current Price" type="number" step="0.01" :value="$security->price"/>
             <x-form-text-input name="type" label="Security Type" :value="$security->type"/>
 
-            <button type="submit">Edit Security</button>
+            <button type="submit">Save</button>
         </form>
     </div>
  </x-app-layout>

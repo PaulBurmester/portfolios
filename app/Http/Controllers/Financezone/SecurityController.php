@@ -15,6 +15,7 @@ class SecurityController extends Controller
     public function index()
     {
         $securities = Security::all();
+
         return view('financezone.security.index', ['securities' => $securities]);
     }
 
@@ -99,8 +100,13 @@ class SecurityController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(string $id)
+    public function destroy(Security $security)
     {
-        //
+        if ($security->holdings()->exists()) {
+            return redirect()->route('security.index')->with('error', 'Security is in an Active Portfolio!');
+        }
+        $security->delete();
+
+        return redirect()->route('security.index');
     }
 }

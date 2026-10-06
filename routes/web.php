@@ -1,5 +1,7 @@
 <?php
 
+use App\Http\Controllers\Financezone\SecurityController;
+use App\Http\Controllers\Userzone\ProfileController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
@@ -11,17 +13,18 @@ Route::get('/dashboard', function () {
 })->middleware(['auth', 'verified'])->name('dashboard');
 
 Route::middleware('auth')->group(function () {
-    Route::get('/profile', [App\Http\Controllers\Userzone\ProfileController::class, 'edit'])->name('profile.edit');
-    Route::patch('/profile', [App\Http\Controllers\Userzone\ProfileController::class, 'update'])->name('profile.update');
-    Route::delete('/profile', [App\Http\Controllers\Userzone\ProfileController::class, 'destroy'])->name('profile.destroy');
+    Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
+    Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
+    Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 });
 
 Route::middleware('auth')->group(function () {
-    Route::get('/securities', [App\Http\Controllers\Financezone\SecurityController::class, 'index'])->name('security.index');
-    Route::get('/securities/create', [App\Http\Controllers\Financezone\SecurityController::class, 'create'])->name('security.create');
-    Route::post('/securities', [App\Http\Controllers\Financezone\SecurityController::class, 'store'])->name('security.store');
-    Route::get('/securities/{security}/edit', [App\Http\Controllers\Financezone\SecurityController::class, 'edit'])->name('security.edit');
-    Route::put('/securities/{security}', [App\Http\Controllers\Financezone\SecurityController::class, 'update'])->name('security.update');
+    Route::get('/securities', [SecurityController::class, 'index'])->name('security.index');
+    Route::get('/securities/create', [SecurityController::class, 'create'])->name('security.create');
+    Route::post('/securities', [SecurityController::class, 'store'])->name('security.store');
+    Route::get('/securities/{security}/edit', [SecurityController::class, 'edit'])->name('security.edit');
+    Route::put('/securities/{security}', [SecurityController::class, 'update'])->name('security.update');
+    Route::delete('securities/{security}', [SecurityController::class, 'destroy'])->name('security.destroy');
 });
 
 require __DIR__.'/auth.php';
