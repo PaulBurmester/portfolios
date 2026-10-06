@@ -25,11 +25,11 @@ Route::middleware('auth')->group(function () {
     Route::post('/securities', [SecurityController::class, 'store'])->name('security.store');
     Route::get('/securities/{security}/edit', [SecurityController::class, 'edit'])->name('security.edit');
     Route::put('/securities/{security}', [SecurityController::class, 'update'])->name('security.update');
-    Route::delete('securities/{security}', [SecurityController::class, 'destroy'])->name('security.destroy');
+    Route::delete('/securities/{security}', [SecurityController::class, 'destroy'])->name('security.destroy');
 });
 
 Route::middleware('auth')->group(function () {
-    Route::get('/portfolios', [SecurityController::class, 'index'])->name('portfolio.index');
+    Route::get('/portfolios', [PortfolioController::class, 'index'])->name('portfolio.index');
 });
 
 require __DIR__.'/auth.php';
