@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\Financezone\SecurityController;
+use App\Http\Controllers\Financezone\PortfolioController;
 use App\Http\Controllers\Userzone\ProfileController;
 use Illuminate\Support\Facades\Route;
 
@@ -25,6 +26,10 @@ Route::middleware('auth')->group(function () {
     Route::get('/securities/{security}/edit', [SecurityController::class, 'edit'])->name('security.edit');
     Route::put('/securities/{security}', [SecurityController::class, 'update'])->name('security.update');
     Route::delete('securities/{security}', [SecurityController::class, 'destroy'])->name('security.destroy');
+});
+
+Route::middleware('auth')->group(function () {
+    Route::get('/portfolios', [SecurityController::class, 'index'])->name('portfolio.index');
 });
 
 require __DIR__.'/auth.php';
