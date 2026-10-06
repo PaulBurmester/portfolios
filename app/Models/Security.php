@@ -2,10 +2,13 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
 class Security extends Model
 {
+    use HasFactory;
+
     protected $fillable = [
         'name',
         'ticker',
@@ -17,7 +20,7 @@ class Security extends Model
     protected $casts = [
         'price' => 'decimal:2',
     ];
-    
+
     public function holdings()
     {
         return $this->hasMany(Holding::class);
