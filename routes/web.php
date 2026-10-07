@@ -34,6 +34,7 @@ Route::middleware('auth')->group(function () {
     Route::post('/portfolios', [PortfolioController::class, 'store'])->name('portfolio.store');
     Route::get('/portfolios/{portfolio}/edit', [PortfolioController::class, 'edit'])->name('portfolio.edit');
     Route::put('/portfolios/{portfolio}', [PortfolioController::class, 'update'])->name('portfolio.update');
+    Route::delete('/portfolios/{portfolio}', [PortfolioController::class, 'destroy'])->name('portfolio.destroy');
 });
 
 require __DIR__.'/auth.php';

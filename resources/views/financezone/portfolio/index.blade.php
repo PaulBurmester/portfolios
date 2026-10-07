@@ -8,6 +8,11 @@
             <div>
                 {{ $portfolio->name }}
                 <a href="{{ route('portfolio.edit', $portfolio) }}">Edit</a>
+                <form method="post" action="{{ route('portfolio.destroy', $portfolio) }}">
+                    @csrf
+                    @method('DELETE')
+                    <button type="submit">Delete</button>
+                </form>
             </div>
         @empty
             <p>Keine Einträge.</p>

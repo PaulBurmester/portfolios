@@ -88,6 +88,10 @@ class PortfolioController extends Controller
      */
     public function destroy(Portfolio $portfolio)
     {
-        //
+        Gate::authorize('delete', $portfolio);
+
+        $portfolio->delete();
+
+        return redirect()->route('portfolio.index');
     }
 }
