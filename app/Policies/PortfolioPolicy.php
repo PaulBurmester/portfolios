@@ -20,7 +20,7 @@ class PortfolioPolicy
      */
     public function view(User $user, Portfolio $portfolio): bool
     {
-        return false;
+        return $user->id === $portfolio->user_id;
     }
 
     /**

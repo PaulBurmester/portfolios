@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Financezone\HoldingController;
 use App\Http\Controllers\Financezone\PortfolioController;
 use App\Http\Controllers\Financezone\SecurityController;
 use App\Http\Controllers\Userzone\ProfileController;
@@ -35,6 +36,7 @@ Route::middleware('auth')->group(function () {
     Route::get('/portfolios/{portfolio}/edit', [PortfolioController::class, 'edit'])->name('portfolio.edit');
     Route::put('/portfolios/{portfolio}', [PortfolioController::class, 'update'])->name('portfolio.update');
     Route::delete('/portfolios/{portfolio}', [PortfolioController::class, 'destroy'])->name('portfolio.destroy');
+    Route::get('/portfolios/{portfolio}/holdings', [HoldingController::class, 'index'])->name('holding.index');
 });
 
 require __DIR__.'/auth.php';
