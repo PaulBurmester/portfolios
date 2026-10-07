@@ -11,6 +11,7 @@
                         <th>Purchase Date</th>
                         <th>Purchase Price</th>
                         <th>Current Price</th>
+                        <th>Profit</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -21,10 +22,16 @@
                             <td>{{$holding->purchase_date->format('d.m.Y')}}</td>
                             <td>{{$holding->purchase_price}}</td>
                             <td>{{$holding->security->price}}</td>
+                            <td>@if ($holding->profit === null)
+                                    –
+                                @else
+                                    {{ number_format($holding->profit, 2, ',', '.') }}
+                                @endif
+                            </td>
                         </tr>
                     @empty
                         <tr>
-                            <td colspan="5">No entries</td>
+                            <td colspan="6">No entries</td>
                         </tr>
                     @endforelse
                 </tbody>
