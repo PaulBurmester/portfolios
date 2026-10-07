@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Casts\Attribute;
 
 class Holding extends Model
 {
@@ -22,6 +23,19 @@ class Holding extends Model
         'purchase_price' => 'decimal:2',
         'purchase_date' => 'date',
     ];
+
+    protected function profit(): Attribute
+    {
+        return Attribute::make(
+            get: function () {
+                if ($this->security->price === null) {
+                    return null;
+                }
+            
+                return $this->quantity * ($this->security->price - $this->purchase_price);
+            },
+        );
+    }
 
     public function portfolio()
     {
