@@ -2,10 +2,13 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
 class Holding extends Model
 {
+    use HasFactory;
+
     protected $fillable = [
         'portfolio_id',
         'security_id',
@@ -13,8 +16,8 @@ class Holding extends Model
         'purchase_price',
         'purchase_date',
     ];
-    
-        protected $casts = [
+
+    protected $casts = [
         'quantity' => 'integer',
         'purchase_price' => 'decimal:2',
         'purchase_date' => 'date',
@@ -29,5 +32,4 @@ class Holding extends Model
     {
         return $this->belongsTo(Security::class);
     }
-
 }
