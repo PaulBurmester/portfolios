@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Financezone;
 use App\Http\Controllers\Controller;
 use App\Models\Portfolio;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Gate;
 
 class PortfolioController extends Controller
 {
@@ -58,7 +59,9 @@ class PortfolioController extends Controller
      */
     public function edit(Portfolio $portfolio)
     {
-        //
+        Gate::authorize('update', $portfolio);
+
+        return view('financezone.portfolio.edit', ['portfolio' => $portfolio]);
     }
 
     /**
@@ -66,7 +69,18 @@ class PortfolioController extends Controller
      */
     public function update(Request $request, Portfolio $portfolio)
     {
-        //
+        Gate::authorize('update', $portfolio);
+
+        $validated = $request->validate([
+            'name' => ['required', 'min:3'],
+        ], [
+            'name.required' => 'You need to enter a Name',
+            'name.min' => 'The Name must have at least 3 characters',
+        ]);
+
+        $portfolio->update($validated);
+
+        return redirect()->route('portfolio.index');
     }
 
     /**

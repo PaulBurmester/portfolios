@@ -7,6 +7,7 @@
         @forelse ($portfolios as $portfolio)
             <div>
                 {{ $portfolio->name }}
+                <a href="{{ route('portfolio.edit', $portfolio) }}">Edit</a>
             </div>
         @empty
             <p>Keine Einträge.</p>
