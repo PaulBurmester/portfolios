@@ -66,8 +66,8 @@
         main button:hover { border-color: var(--color-accent); color: var(--color-accent); }
         main button[type=submit] { background-color: var(--color-accent); color: var(--color-ink); border-color: var(--color-accent); }
         main button[type=submit]:hover { color: var(--color-ink); filter: brightness(1.1); }
-        main td button[type=submit] { background-color: var(--color-raised); color: var(--color-muted); border-color: var(--color-line); }
-        main td button[type=submit]:hover { color: #f87171; border-color: #f87171; filter: none; }
+        main form:has(input[name=_method][value=DELETE]) button[type=submit] { background-color: var(--color-raised); color: var(--color-muted); border-color: var(--color-line); }
+        main form:has(input[name=_method][value=DELETE]) button[type=submit]:hover { color: #f87171; border-color: #f87171; filter: none; }
         main td form { display: inline-block; margin: 0 0.75rem 0 0; }
     }
 </style>
