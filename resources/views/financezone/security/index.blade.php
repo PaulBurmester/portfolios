@@ -5,7 +5,7 @@
 
     <div>
         @if (session('error'))
-            <p class="text-red-600 text-sm">{{ session('error') }}</p>
+            <p class="text-red-400 text-sm">{{ session('error') }}</p>
         @endif
         @forelse ($securities as $security)
             <div>

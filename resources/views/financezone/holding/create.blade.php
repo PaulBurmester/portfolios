@@ -22,7 +22,7 @@
                 </select>
 
                 @error('security_id')
-                    <p class="text-red-600 text-sm"> {{ $message }} </p>
+                    <p class="text-red-400 text-sm"> {{ $message }} </p>
                 @enderror
             </div>
             <x-form-text-input name="quantity" label="Number of Shares" type="number" step="1" required />
