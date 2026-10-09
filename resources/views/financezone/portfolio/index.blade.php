@@ -8,7 +8,7 @@
             <div>
                 {{ $portfolio->name }}
                 <a href="{{ route('portfolio.edit', $portfolio) }}">Edit</a>
-                <a href="{{ route('holding.index', $portfolio) }}">Holdings</a>
+                <a href="{{ route('holding.index', $portfolio) }}">View</a>
                 <form method="post" action="{{ route('portfolio.destroy', $portfolio) }}">
                     @csrf
                     @method('DELETE')

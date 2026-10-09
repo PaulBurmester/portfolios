@@ -31,5 +31,6 @@
             
             <button type="submit">Add to {{$portfolio->name}}</button>
         </form>
+        <a href="{{ route('holding.index') }}">Back</a>
     </div>
  </x-app-layout>

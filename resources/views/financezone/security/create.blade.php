@@ -15,5 +15,6 @@
 
             <button type="submit">Create Security</button>
         </form>
+        <a href="{{ route('security.index') }}">Back</a>
     </div>
  </x-app-layout>

@@ -12,5 +12,6 @@
 
             <button type="submit">Save</button>
         </form>
+        <a href="{{ route('portfolio.index') }}">Back</a>
     </div>
  </x-app-layout>
