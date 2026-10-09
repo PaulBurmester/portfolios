@@ -15,6 +15,6 @@
             
             <button type="submit">Save</button>
         </form>
-        <a href="{{ route('holding.index') }}">Back</a>
+        <a href="{{ route('holding.index', $portfolio) }}">Back</a>
     </div>
  </x-app-layout>
