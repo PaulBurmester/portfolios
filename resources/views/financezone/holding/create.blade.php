@@ -1,6 +1,6 @@
 <x-app-layout>
     <x-slot name="header">
-        <h2>Add Security to {{$portfolio->name}}</h2>
+        <h2>Add holding to {{$portfolio->name}}</h2>
     </x-slot>
 
     <div>
