@@ -3,14 +3,16 @@
         <h2>Create a new Portfolio</h2>
     </x-slot>
 
-    <div>
+    <div class="max-w-xl bg-surface border border-line rounded-xl p-6 sm:p-8">
         <form method="post" action="{{ route('portfolio.store') }}">
             @csrf
 
             <x-form-text-input name="name" label="Portfolio Name" required />
 
-            <button type="submit">Create Portfolio</button>
+            <div class="flex items-center gap-4 pt-2">
+                <button type="submit">Create Portfolio</button>
+                <a class="text-sm text-muted hover:text-fg transition-colors" href="{{ route('portfolio.index') }}">Back</a>
+            </div>
         </form>
-        <a href="{{ route('portfolio.index') }}">Back</a>
     </div>
  </x-app-layout>
