@@ -1,6 +1,6 @@
 <x-app-layout>
     <x-slot name="header">
-        <h2>{{ $portfolio->name }}</h2>
+        <h2>{{$portfolio->name}}</h2>
     </x-slot>
         <div>
             <table>

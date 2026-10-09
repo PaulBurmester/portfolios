@@ -37,6 +37,8 @@ Route::middleware('auth')->group(function () {
     Route::put('/portfolios/{portfolio}', [PortfolioController::class, 'update'])->name('portfolio.update');
     Route::delete('/portfolios/{portfolio}', [PortfolioController::class, 'destroy'])->name('portfolio.destroy');
     Route::get('/portfolios/{portfolio}/holdings', [HoldingController::class, 'index'])->name('holding.index');
+    Route::get('/portfolios/{portfolio}/holdings/create', [HoldingController::class, 'create'])->name('holding.create');
+    Route::post('/portfolios/{portfolio}/holdings', [HoldingController::class, 'store'])->name('holding.store');
 });
 
 require __DIR__.'/auth.php';
