@@ -41,6 +41,8 @@ Route::middleware('auth')->group(function () {
     Route::post('/portfolios/{portfolio}/holdings', [HoldingController::class, 'store'])->name('holding.store');
     Route::get('/portfolios/{portfolio}/holdings/{holding}/edit', [HoldingController::class, 'edit'])->name('holding.edit')->scopeBindings();
     Route::put('/portfolios/{portfolio}/holdings/{holding}', [HoldingController::class, 'update'])->name('holding.update')->scopeBindings();
+    Route::delete('/portfolios/{portfolio}/holdings/{holding}', [HoldingController::class, 'destroy'])->name('holding.destroy')->scopeBindings();
 });
 
 require __DIR__.'/auth.php';
+1

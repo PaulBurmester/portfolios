@@ -94,4 +94,13 @@ class HoldingController extends Controller
 
         return redirect()->route('holding.index', ['portfolio' => $portfolio]);
     }
+
+    public function destroy(Portfolio $portfolio, Holding $holding)
+    {
+        Gate::authorize('delete', $portfolio);
+
+        $holding->delete();
+
+        return redirect()->route('holding.index', ['portfolio' => $portfolio]);
+    }
 }

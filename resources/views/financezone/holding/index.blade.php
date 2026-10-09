@@ -12,6 +12,8 @@
                         <th>Purchase Price</th>
                         <th>Current Price</th>
                         <th>Profit</th>
+                        <th>Actions</th>
+                        
                     </tr>
                 </thead>
                 <tbody>
@@ -28,13 +30,22 @@
                                     {{ number_format($holding->profit, 2, ',', '.') }}
                                 @endif
                             </td>
+                            <td>
+                                <form method="post" action="{{ route('holding.destroy', [$portfolio, $holding]) }}">
+                                    @csrf
+                                    @method('DELETE')
+                                    <button type="submit">Delete</button>
+                                </form>
+                                <a href="{{ route('holding.edit', [$portfolio, $holding]) }}">Edit</a>
+                            </td>
                         </tr>
                     @empty
                         <tr>
-                            <td colspan="6">No entries</td>
+                            <td colspan="7">No entries</td>
                         </tr>
                     @endforelse
                 </tbody>
             </table>
+            <a href="{{ route('holding.create', [$portfolio]) }}">Add new Holding</a>
         </div>
  </x-app-layout>
