@@ -11,6 +11,9 @@
                 <div class="p-6 text-gray-900">
                     {{ __("You're logged in!") }}
                 </div>
+                <div class="p-6 text-gray-900">
+                    Your total profit: {{ number_format($totalProfit, 2, ',', '.') }}
+                </div>
             </div>
         </div>
     </div>

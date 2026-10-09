@@ -5,13 +5,12 @@ use App\Http\Controllers\Financezone\PortfolioController;
 use App\Http\Controllers\Financezone\SecurityController;
 use App\Http\Controllers\Userzone\ProfileController;
 use Illuminate\Support\Facades\Route;
+use Illuminate\Http\Request;
 
-Route::get('/', function () {
-    return view('welcome');
-});
+Route::redirect('/', '/dashboard');
 
-Route::get('/dashboard', function () {
-    return view('userzone.dashboard');
+Route::get('/dashboard', function (Request $request) {
+    return view('userzone.dashboard', ['totalProfit' => $request->user()->totalProfit()]);
 })->middleware(['auth', 'verified'])->name('dashboard');
 
 Route::middleware('auth')->group(function () {

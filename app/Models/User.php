@@ -51,4 +51,13 @@ class User extends Authenticatable
     {
         return $this->hasMany(Portfolio::class);
     }
+    
+    public function totalProfit()
+    {
+        $totalProfit = $this->portfolios()->with('holdings.security')->get();
+
+        return $totalProfit
+            ->flatMap(fn ($portfolio) => $portfolio->holdings)
+            ->sum(fn ($holding) => $holding->profit);
+    }
 }
