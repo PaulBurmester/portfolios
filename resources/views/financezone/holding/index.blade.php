@@ -1,33 +1,50 @@
 <x-app-layout>
     <x-slot name="header">
-        <h2>{{$portfolio->name}}</h2>
+        <div class="flex items-baseline gap-4">
+            <h2>{{ $portfolio->name }}</h2>
+            <a class="text-sm text-muted hover:text-fg transition-colors" href="{{ route('portfolio.index') }}">← All portfolios</a>
+        </div>
     </x-slot>
-        <div>
-            <table>
+
+    <div>
+        <div class="mb-8 flex justify-end">
+            <a class="inline-flex items-center rounded-lg bg-accent px-4 py-2 text-sm font-semibold text-ink hover:brightness-110 transition" href="{{ route('holding.create', [$portfolio]) }}">Add new Holding</a>
+        </div>
+
+        <div class="bg-surface border border-line rounded-xl overflow-x-auto">
+            <table class="!mb-0">
                 <thead>
                     <tr>
                         <th>Security</th>
-                        <th>Shares</th>
+                        <th class="!text-right">Shares</th>
                         <th>Purchase Date</th>
-                        <th>Purchase Price</th>
-                        <th>Current Price</th>
-                        <th>Profit</th>
+                        <th class="!text-right">Purchase Price</th>
+                        <th class="!text-right">Current Price</th>
+                        <th class="!text-right">Profit</th>
                         <th>Actions</th>
-                        
                     </tr>
                 </thead>
                 <tbody>
                     @forelse ($holdings as $holding)
                         <tr>
-                            <td>{{$holding->security->name}}</td>
-                            <td>{{$holding->quantity}}</td>
-                            <td>{{$holding->purchase_date->format('d.m.Y')}}</td>
-                            <td>{{$holding->purchase_price}}</td>
-                            <td>{{$holding->security->price}}</td>
-                            <td>@if ($holding->profit === null)
-                                    –
+                            <td class="font-medium">{{ $holding->security->name }}</td>
+                            <td class="text-right">{{ $holding->quantity }}</td>
+                            <td class="text-muted">{{ $holding->purchase_date->format('d.m.Y') }}</td>
+                            <td class="text-right">{{ number_format($holding->purchase_price, 2, ',', '.') }}</td>
+                            <td class="text-right">
+                                @if ($holding->security->price === null)
+                                    <span class="text-muted">–</span>
                                 @else
-                                    {{ number_format($holding->profit, 2, ',', '.') }}
+                                    {{ number_format($holding->security->price, 2, ',', '.') }}
+                                @endif
+                            </td>
+                            <td class="text-right font-medium">
+                                @if ($holding->profit === null)
+                                    <span class="text-muted">–</span>
+                                @else
+                                    <span class="{{ $holding->profit < 0 ? 'text-red-400' : 'text-accent' }}">
+                                        {{ number_format($holding->profit, 2, ',', '.') }}
+                                    </span>
                                 @endif
                             </td>
                             <td>
@@ -41,11 +58,11 @@
                         </tr>
                     @empty
                         <tr>
-                            <td colspan="7">No entries</td>
+                            <td colspan="7" class="text-muted">No entries</td>
                         </tr>
                     @endforelse
                 </tbody>
             </table>
-            <a href="{{ route('holding.create', [$portfolio]) }}">Add new Holding</a>
         </div>
- </x-app-layout>
+    </div>
+</x-app-layout>
