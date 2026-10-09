@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Financezone;
 
 use App\Http\Controllers\Controller;
+use App\Models\Holding;
 use App\Models\Portfolio;
 use App\Models\Security;
 use Illuminate\Http\Request;
@@ -55,6 +56,41 @@ class HoldingController extends Controller
         ]);
 
         $portfolio->holdings()->create($validated);
+
+        return redirect()->route('holding.index', ['portfolio' => $portfolio]);
+    }
+
+    public function edit(Portfolio $portfolio, Holding $holding)
+    {
+        Gate::authorize('update', $portfolio);
+
+        return view('financezone.holding.edit', ['holding' => $holding, 'portfolio' => $portfolio]);
+    }
+
+    /**
+     * Update the specified resource in storage.
+     */
+    public function update(Request $request, Portfolio $portfolio, Holding $holding)
+    {
+        Gate::authorize('update', $portfolio);
+
+        $validated = $request->validate([
+            'quantity' => ['required', 'integer', 'min:1'],
+            'purchase_price' => ['required', 'numeric', 'min:0'],
+            'purchase_date' => ['required', 'date', 'before_or_equal:today'],
+        ], [
+            'quantity.required' => 'Please give a number of shares',
+            'quantity.integer' => 'Must be a Number',
+            'quantity.min' => 'Must be a positive Number',
+            'purchase_price.required' => 'Please give a purchase price per share',
+            'purchase_price.numeric' => 'Must be a Number',
+            'purchase_price.min' => 'Must be a positive Number',
+            'purchase_date.required' => 'Choose a date',
+            'purchase_date.date' => 'Choose a date',
+            'purchase_date.before_or_equal' => 'Choose a date that is not in the future',
+        ]);
+
+        $holding->update($validated);
 
         return redirect()->route('holding.index', ['portfolio' => $portfolio]);
     }
